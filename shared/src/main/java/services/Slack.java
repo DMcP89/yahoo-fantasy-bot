@@ -11,7 +11,7 @@ public class Slack extends Service {
     private static final Logger log = LogManager.getLogger(Slack.class);
 
     public Slack() {
-        super(EnvHandler.SLACK_WEBHOOK_URL.getValue());
+        super("Slack", EnvHandler.SLACK_WEBHOOK_URL.getValue());
     }
 
     @Override
@@ -31,7 +31,7 @@ public class Slack extends Service {
     @Override
     void sendMessage(String message) {
         try {
-            final HttpResponse<String> response = Unirest.post(url)
+            final HttpResponse<String> response = Unirest.post(apiURL)
                     .header("Content-Type", "application/json")
                     .body("{\"text\" : \"```\\n" + message + "```\"}")
                     .asString();

@@ -12,7 +12,7 @@ public class GroupMe extends Service {
     private static final Logger log = LogManager.getLogger(GroupMe.class);
 
     public GroupMe() {
-        super("https://api.groupme.com/v3/bots/post");
+        super("GroupMe", "https://api.groupme.com/v3/bots/post");
     }
 
     @Override
@@ -32,7 +32,7 @@ public class GroupMe extends Service {
     @Override
     void sendMessage(String message) {
         try {
-            final HttpResponse<JsonNode> response = Unirest.post(url)
+            final HttpResponse<JsonNode> response = Unirest.post(apiURL)
                     .header("Content-Type", "application/json")
                     .body("{\"text\" : \"" + message + "\", \"bot_id\" : \"" + EnvHandler.GROUP_ME_BOT_ID.getValue() + "\"}")
                     .asJson();

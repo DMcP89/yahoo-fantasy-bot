@@ -39,24 +39,49 @@ public class ServicesHandler {
 
             TimeZoneData.checkTimezoneEnv();
 
+            for (EnvHandler e : EnvHandler.values()) {
+                log.info(e + ":" + e.getValue());
+                switch (e) {
+                    case GROUP_ME_ACCESS_TOKEN:
+                    case GROUP_ME_BOT_ID:
+                    case GROUP_ME_GROUP_ID:
+                        if (e.getValue() == null) {
+                            groupMe.setActivated(false);
+                        }
+                        break;
+                    case DISCORD_WEBHOOK_URL:
+                        if (e.getValue() == null) {
+                            discord.setActivated(false);
+                        }
+                        break;
+                    case SLACK_WEBHOOK_URL:
+                        if (e.getValue() == null) {
+                            slack.setActivated(false);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             if (EnvHandler.GROUP_ME_ACCESS_TOKEN.getValue() == null) {
-                groupMe.shouldNotUse();
+                groupMe.setActivated(false);
             }
 
             if (EnvHandler.GROUP_ME_BOT_ID.getValue() == null) {
-                groupMe.shouldNotUse();
+                groupMe.setActivated(false);
             }
 
             if (EnvHandler.GROUP_ME_GROUP_ID.getValue() == null) {
-                groupMe.shouldNotUse();
+                groupMe.setActivated(false);
             }
 
             if (EnvHandler.DISCORD_WEBHOOK_URL.getValue() == null) {
-                discord.shouldNotUse();
+                discord.setActivated(false);
             }
 
             if (EnvHandler.SLACK_WEBHOOK_URL.getValue() == null) {
-                slack.shouldNotUse();
+                slack.setActivated(false);
             }
 
             logServicesUsed();
@@ -91,16 +116,8 @@ public class ServicesHandler {
     }
 
     private static void logServicesUsed() {
-        if (groupMe.shouldUse()) {
-            log.debug("Using GroupMe.");
-        }
-
-        if (discord.shouldUse()) {
-            log.debug("Using Discord.");
-        }
-
-        if (slack.shouldUse()) {
-            log.debug("Using Slack.");
+        for (Service s : services) {
+            System.out.println(s);
         }
     }
 }

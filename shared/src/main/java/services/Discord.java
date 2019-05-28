@@ -12,12 +12,12 @@ public class Discord extends Service {
     private static final Logger log = LogManager.getLogger(Discord.class);
 
     public Discord() {
-        super(EnvHandler.DISCORD_WEBHOOK_URL.getValue());
+        super("Discord", EnvHandler.DISCORD_WEBHOOK_URL.getValue());
     }
 
     @Override
     public void createMessage(String message) {
-        if (shouldUse()) {
+        if (isActivated()) {
             final String correctedMessage = correctMessage(message);
 
             if (correctedMessage.length() < 2000) {
@@ -32,7 +32,7 @@ public class Discord extends Service {
     @Override
     void sendMessage(String message) {
         try {
-            final HttpResponse<JsonNode> response = Unirest.post(url)
+            final HttpResponse<JsonNode> response = Unirest.post(apiURL)
                     .header("Content-Type", "application/json")
                     .body("{\"content\" : \"```\\n" + message + "```\"}")
                     .asJson();

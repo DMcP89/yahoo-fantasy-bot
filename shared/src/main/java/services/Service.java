@@ -6,13 +6,15 @@ import org.apache.logging.log4j.Logger;
 public abstract class Service implements Runnable {
     private static final Logger log = LogManager.getLogger(Service.class);
 
-    private boolean shouldUse = true;
+    private boolean isActivated;
 
-    final String url;
+    final String apiURL;
     private String currentMessage;
+    private final String name;
 
-    public Service(String url) {
-        this.url = url;
+    Service(String name, String apiURL) {
+        this.name = name;
+        this.apiURL = apiURL;
     }
 
     /**
@@ -28,14 +30,6 @@ public abstract class Service implements Runnable {
      * @param message the message to send
      */
     abstract void sendMessage(String message);
-
-    public void shouldNotUse() {
-        this.shouldUse = false;
-    }
-
-    public boolean shouldUse() {
-        return shouldUse;
-    }
 
     String correctMessage(String message) {
         try {
@@ -58,11 +52,27 @@ public abstract class Service implements Runnable {
         this.currentMessage = currentMessage;
     }
 
+    public boolean isActivated() {
+        return isActivated;
+    }
+
+    public void setActivated(boolean activated) {
+        isActivated = activated;
+    }
+
     @Override
     public void run() {
-        if(currentMessage != null) {
+        if (currentMessage != null) {
             createMessage(currentMessage);
             currentMessage = null;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "\nService: " + name +
+                "\nActivated: " + isActivated +
+                "\nAPI URL: " + apiURL +
+                "\n===";
     }
 }
