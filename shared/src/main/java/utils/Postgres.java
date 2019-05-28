@@ -22,12 +22,13 @@ public class Postgres {
 
         while (connection == null) {
             if (attempts >= 100) {
-                log.fatal("There have been 100 attempts to connect to the DB.  None have been successful.  Exiting.", new Throwable());
+                log.fatal("There have been 100 attempts to connect to the DB.  " +
+                        "None have been successful.  Exiting.", new Throwable());
                 System.exit(-1);
             }
 
             try {
-                log.trace("Connection does not exist to database.  Creating...");
+                log.trace("Creating connection to database...");
 
                 connection = DriverManager.getConnection(EnvHandler.JDBC_DATABASE_URL.getValue());
 
@@ -104,7 +105,7 @@ public class Postgres {
     /**
      * Marks that the start up message has been received by the users.  This is so that the message is not sent every-time the application is started.
      */
-    public static void markStartupMessageReceived() {
+    public static void markStartupMessageSent() {
         try {
             getConnection();
 
@@ -126,7 +127,7 @@ public class Postgres {
      *
      * @return whether or not the startup message was sent
      */
-    public static boolean getStartupMessageSent() {
+    public static boolean wasStartUpMessageSent() {
         try {
             getConnection();
 
@@ -230,34 +231,5 @@ public class Postgres {
         } catch (SQLException e) {
             log.error(e.getLocalizedMessage(), new Throwable());
         }
-    }
-
-    public static void saveMessage(JSONObject message) {
-        try {
-            getConnection();
-
-            log.trace("Attempting to save message...");
-
-            final Statement statement = connection.createStatement();
-
-            final String name = message.getString("name");
-            final long message_id = message.getLong("id");
-            final long user_id = message.getLong("user_id");
-            final String mess = message.getString("text");
-            final long time = message.getLong("created_at");
-
-            final String sql = "INSERT INTO messages (\"name\", \"message_id\", \"user_id\", \"message\", \"time\")" + " VALUES (\'" + name + "\', \'"
-                    + message_id + "\', \'" + user_id + "\', \'" + mess + "\', \'" + time + "\')";
-
-            statement.executeUpdate(sql);
-
-            log.trace("Message has been saved.");
-        } catch (SQLException e) {
-            log.error(e.getLocalizedMessage(), new Throwable());
-        }
-    }
-
-    public static void grabMessages() {
-
     }
 }
