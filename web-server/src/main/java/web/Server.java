@@ -8,7 +8,6 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import utils.EnvHandler;
 import utils.Postgres;
-import worker.Bot;
 
 import static spark.Spark.*;
 
@@ -43,14 +42,14 @@ public class Server {
         });
 
         post("/message", (req, res) -> {
-            if(req.body() != null && !req.body().isEmpty()) {
+            if (req.body() != null && !req.body().isEmpty()) {
                 final JSONObject j = new JSONObject(req.body());
                 CommandInterpreter.interpretCommand(j.getString("text"));
             }
             return null;
         });
 
-        get("/keepalive", (req, res) -> true);
+        get("/keepAlive", (req, res) -> true);
     }
 
     /**

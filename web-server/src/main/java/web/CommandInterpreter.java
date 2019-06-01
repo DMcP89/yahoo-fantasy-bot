@@ -77,7 +77,6 @@ public class CommandInterpreter {
                         return "ERROR: Please enter a valid number for transactions amount.";
                     }
                     return Yahoo.getTransactions(Integer.parseInt(m[2]), Integer.parseInt(m[3]));
-
                 default:
                     return null;
             }
@@ -108,6 +107,7 @@ public class CommandInterpreter {
     }
 
     private static String unknownCommand(String message) {
-        return "The command \\\"" + message + "\\\" is not a valid command. Please type \\\"./fantasy help\\\" for a list of available commands.";
+        return "The command \\\"" + message + "\\\" is not a valid command. " +
+                "Please type \\\"./fantasy help\\\" for a list of available commands.";
     }
 }

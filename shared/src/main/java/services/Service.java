@@ -1,10 +1,6 @@
 package services;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public abstract class Service implements Runnable {
-    private static final Logger log = LogManager.getLogger(Service.class);
 
     private boolean isActivated;
 
@@ -32,20 +28,13 @@ public abstract class Service implements Runnable {
     abstract void sendMessage(String message);
 
     String correctMessage(String message) {
-        try {
-            Thread.sleep(1000);
-            if (message.endsWith("\\")) {
-                message = message.substring(0, message.length() - 1);
-            } else if (message.startsWith("n")) {
-                message = message.substring(1);
-            }
-
-            return message;
-        } catch (InterruptedException e) {
-            log.error(e.getLocalizedMessage(), new Throwable());
-
-            return null;
+        if (message.endsWith("\\")) {
+            message = message.substring(0, message.length() - 1);
+        } else if (message.startsWith("n")) {
+            message = message.substring(1);
         }
+
+        return message;
     }
 
     public void setCurrentMessage(String currentMessage) {
