@@ -25,4 +25,3 @@ CREATE TABLE tokens (
 );
 
 CREATE UNIQUE INDEX t_pkey ON tokens("yahooTokenRetrievedTime" int8_ops);
-
