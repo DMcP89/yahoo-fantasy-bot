@@ -1,7 +1,6 @@
 package bot.utils
 
 import bot.bridges.*
-import io.reactivex.Observable
 import bot.messaging_services.Discord
 import bot.messaging_services.GroupMe
 import bot.messaging_services.Message
@@ -11,6 +10,9 @@ import bot.utils.jobs.CloseScoreUpdateJob
 import bot.utils.jobs.MatchUpJob
 import bot.utils.jobs.ScoreUpdateJob
 import bot.utils.jobs.StandingsJob
+import bot.utils.models.YahooApiRequest
+import io.reactivex.rxjava3.core.Observable
+import shared.EnvVariable
 import shared.Postgres
 import java.util.concurrent.TimeUnit
 
@@ -30,9 +32,9 @@ object Arbiter {
         Observable.interval(0, 15, TimeUnit.SECONDS)
             .subscribe {
                 try {
-                    val event = DataRetriever.getTransactions()
+                    val event = DataRetriever.yahooApiRequest(YahooApiRequest.Transactions)
                     val latestTimeChecked = Postgres.latestTimeChecked
-                    TransactionsBridge.dataObserver.onNext(Pair(latestTimeChecked, event))
+                    TransactionsBridge.dataObserver.accept(Pair(latestTimeChecked, event))
                     Postgres.saveLastTimeChecked()
                 } catch (e: Exception) {
                     println(e.localizedMessage)
@@ -41,11 +43,15 @@ object Arbiter {
     }
 
     private fun sendInitialMessage() {
-        val startUpMessage =
-            "Hey there! I am the Yahoo Fantasy Bot that notifies you about all things happening in your league!" +
-                    "  Star me on Github: https://github.com/landonp1203/yahoo-fantasy-bot"
         if (!Postgres.startupMessageSent) {
-            MessageBridge.dataObserver.onNext(Message.Generic(startUpMessage))
+            MessageBridge.dataObserver.accept(
+                Message.Generic(
+                    """
+                        |Hey there! I am the Yahoo Fantasy Bot that notifies you about all things happening in your league!
+                        |Star me on Github: https://github.com/landonp1203/yahoo-fantasy-bot
+                    """.trimMargin()
+                )
+            )
             Postgres.markStartupMessageReceived()
         } else {
             println("Start up message already sent, not sending...")
@@ -95,14 +101,23 @@ object Arbiter {
         val messages = MessageBridge.dataObservable
             .convertToStringMessage()
 
-        messages.subscribe(Discord)
-        messages.subscribe(GroupMe)
-        messages.subscribe(Slack)
+        if (EnvVariable.Str.DiscordWebhookUrl.variable.isNotEmpty()) {
+            messages.subscribe(Discord)
+        }
+        if (EnvVariable.Str.GroupMeBotId.variable.isNotEmpty()) {
+            messages.subscribe(GroupMe)
+        }
+        if (EnvVariable.Str.SlackWebhookUrl.variable.isNotEmpty()) {
+            messages.subscribe(Slack)
+        }
     }
 
     private fun setupJobs() {
-        // Times are in GMT since it is not effected by DST
-        JobRunner.createJob(CloseScoreUpdateJob::class.java, "0 30 23 ? 9-1 MON *")
+        // Times are in UTC since it is not effected by DST
+        if (EnvVariable.Bool.OptInCloseScore.variable) {
+            JobRunner.createJob(CloseScoreUpdateJob::class.java, "0 30 23 ? 9-1 MON *")
+        }
+
         JobRunner.createJob(MatchUpJob::class.java, "0 30 23 ? 9-1 THU *")
         JobRunner.createJob(StandingsJob::class.java, "0 30 16 ? 9-1 TUE *")
 
@@ -112,6 +127,7 @@ object Arbiter {
         JobRunner.createJob(ScoreUpdateJob::class.java, "0 00 0 ? 9-1 MON *")
         JobRunner.createJob(ScoreUpdateJob::class.java, "0 55 3 ? 9-1 MON *")
         JobRunner.createJob(ScoreUpdateJob::class.java, "0 55 3 ? 9-1 TUE *")
+
 
         JobRunner.runJobs()
     }
