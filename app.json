@@ -10,11 +10,8 @@
     "chat bot",
     "ff"
   ],
-  "website": "https://github.com/landonp1203/yahoo-fantasy-bot",
-  "repository": "https://github.com/landonp1203/yahoo-fantasy-bot",
-  "scripts": {
-    "postdeploy": "psql $DATABASE_URL -f db_provision.sql"
-  },
+  "website": "https://github.com/LandonPatmore/yahoo-fantasy-bot",
+  "repository": "https://github.com/LandonPatmore/yahoo-fantasy-bot",
   "env": {
     "GROUP_ME_BOT_ID": {
       "description": "GroupMe Bot ID",
@@ -27,7 +24,7 @@
       "required": false
     },
     "SLACK_WEBHOOK_URL": {
-      "description": "Discord Web Hook URL",
+      "description": "Slack Web Hook URL",
       "value": "",
       "required": false
     },
@@ -48,11 +45,6 @@
     },
     "YAHOO_LEAGUE_ID": {
       "description": "Yahoo League ID",
-      "value": "",
-      "required": true
-    },
-    "OPT_IN_CLOSE_SCORE": {
-      "description": "Interested in getting close score updates? (TRUE OR FALSE)",
       "value": "",
       "required": true
     }
